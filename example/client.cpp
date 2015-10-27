@@ -1,64 +1,57 @@
 #include <iostream>
-#include <cstring>      // Needed for memset
-#include <sys/socket.h> // Needed for the socket functions
-#include <netdb.h>      // Needed for the socket functions
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#define MAXHOSTNAME 256
+using namespace std;
 
-int main()
+main()
 {
+   struct sockaddr_in remoteSocketInfo;
+   struct hostent *hPtr;
+   int socketHandle;
+   const char *remoteHost="localhost";
+   int portNumber = 21702;
 
-    int status;
-    struct addrinfo host_info;       // The struct that getaddrinfo() fills up with data.
-    struct addrinfo *host_info_list; // Pointer to the to the linked list of host_info's.
+   memset(&remoteSocketInfo, 0, sizeof(sockaddr_in)); // Clear structure memory
 
-    // The MAN page of getaddrinfo() states "All  the other fields in the structure pointed
-    // to by hints must contain either 0 or a null pointer, as appropriate." When a struct
-    // is created in c++, it will be given a block of memory. This memory is not nessesary
-    // empty. Therefor we use the memset function to make sure all fields are NULL.
-    memset(&host_info, 0, sizeof host_info);
+   // Get system information
 
-    std::cout << "Setting up the structs..."  << std::endl;
+   if((hPtr = gethostbyname(remoteHost)) == NULL)
+   {
+      cerr << "System DNS name resolution not configured properly." << endl;
+      cerr << "Error number: " << ECONNREFUSED << endl;
+      exit(EXIT_FAILURE);
+   }
 
-    host_info.ai_family = AF_UNSPEC;     // IP version not specified. Can be both.
-    host_info.ai_socktype = SOCK_STREAM; // Use SOCK_STREAM for TCP or SOCK_DGRAM for UDP.
+   // create socket
 
-    // Now fill up the linked list of host_info structs with google's address information.
-    status = getaddrinfo("localhost", "5556", &host_info, &host_info_list);
-    // getaddrinfo returns 0 on succes, or some other value when an error occured.
-    // (translated into human readable text by the gai_gai_strerror function).
-    if (status != 0)  std::cout << "getaddrinfo error" << gai_strerror(status) ;
+   if((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+   {
+      close(socketHandle);
+      exit(EXIT_FAILURE);
+   }
 
+   // Load system information into socket data structures
 
-    std::cout << "Creating a socket..."  << std::endl;
-    int socketfd ; // The socket descripter
-    socketfd = socket(host_info_list->ai_family, host_info_list->ai_socktype,
-                      host_info_list->ai_protocol);
-    if (socketfd == -1)  std::cout << "socket error " ;
+   memcpy((char *)&remoteSocketInfo.sin_addr, hPtr->h_addr, hPtr->h_length);
+   remoteSocketInfo.sin_family = AF_INET;
+   remoteSocketInfo.sin_port = htons((u_short)portNumber);      // Set port number
 
+   if(connect(socketHandle, (struct sockaddr *)&remoteSocketInfo, sizeof(sockaddr_in)) < 0)
+   {
+      close(socketHandle);
+      exit(EXIT_FAILURE);
+   }
 
-    std::cout << "Connect()ing..."  << std::endl;
-    status = connect(socketfd, host_info_list->ai_addr, host_info_list->ai_addrlen);
-    if (status == -1)  std::cout << "connect error" ;
+   int rc = 0;  // Actual number of bytes read by function read()
+   char buf[512];
 
-
-    std::cout << "send()ing message..."  << std::endl;
-    const char *msg = "GET / HTTP/1.1\nhost: www.google.com\n\n";
-    int len;
-    ssize_t bytes_sent;
-    len = strlen(msg);
-    bytes_sent = send(socketfd, msg, len, 0);
-
-    std::cout << "Waiting to recieve data..."  << std::endl;
-    ssize_t bytes_recieved;
-    char incomming_data_buffer[1000];
-    bytes_recieved = recv(socketfd, incomming_data_buffer,1000, 0);
-    // If no data arrives, the program will just wait here until some data arrives.
-    if (bytes_recieved == 0) std::cout << "host shut down." << std::endl ;
-    if (bytes_recieved == -1)std::cout << "recieve error!" << std::endl ;
-    std::cout << bytes_recieved << " bytes recieved :" << std::endl ;
-    incomming_data_buffer[bytes_recieved] = '\0' ;
-    std::cout << incomming_data_buffer << std::endl;
-    std::cout << "Receiving complete. Closing socket..." << std::endl;
-    freeaddrinfo(host_info_list);
-    close(socketfd);
-
+   strcpy(buf,"Message to send");
+   send(socketHandle, buf, strlen(buf)+1, 0);
 }
+

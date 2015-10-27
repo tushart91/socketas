@@ -1,59 +1,50 @@
 #include <iostream>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <stdio.h>
-#define MAXHOSTNAME 256
+#include <network_utils.h>
+#include <client.h>
 using namespace std;
 
-main()
+Client::Client(int port_number, const char *remote_host, int remote_port)
 {
-   struct sockaddr_in remoteSocketInfo;
-   struct hostent *hPtr;
-   int socketHandle;
-   const char *remoteHost="localhost";
-   int portNumber = 21702;
-
-   bzero(&remoteSocketInfo, sizeof(sockaddr_in));  // Clear structure memory
-   //memset(&remoteSocketInfo, 0, sizeof(remoteSocketInfo));
-
-   // Get system information
-
-   if((hPtr = gethostbyname(remoteHost)) == NULL)
-   {
-      cerr << "System DNS name resolution not configured properly." << endl;
-      cerr << "Error number: " << ECONNREFUSED << endl;
-      exit(EXIT_FAILURE);
-   }
-
-   // create socket
-
-   if((socketHandle = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-   {
-      close(socketHandle);
-      exit(EXIT_FAILURE);
-   }
-
-   // Load system information into socket data structures
-
-   memcpy((char *)&remoteSocketInfo.sin_addr, hPtr->h_addr, hPtr->h_length);
-   remoteSocketInfo.sin_family = AF_INET;
-   remoteSocketInfo.sin_port = htons((u_short)portNumber);      // Set port number
-
-   if(connect(socketHandle, (struct sockaddr *)&remoteSocketInfo, sizeof(sockaddr_in)) < 0)
-   {
-      close(socketHandle);
-      exit(EXIT_FAILURE);
-   }
-
-   int rc = 0;  // Actual number of bytes read by function read()
-   char buf[512];
-
-   strcpy(buf,"Message to send");
-   send(socketHandle, buf, strlen(buf)+1, 0);
+	createStaticTCPSocket(port_number, &d_tcpSocketHandle);
+    createDynamicUDPSocket(remote_port, remote_host, &d_udpSocketHandle, &d_remoteSocketInfo);
+}
+Client::~Client()
+{
+    closeSocket(d_tcpSocketHandle);
+	closeSocket(d_udpSocketHandle);
+}
+int Client::send(const char *buff)
+{
+    return udpSend(d_udpSocketHandle, d_remoteSocketInfo, buff);
+}
+int Client::receive(char *buff)
+{
+	return tcpReceive(d_tcpSocketHandle, buff);
 }
 
+int main()
+{
+    char buff[512];
+    int portNumber = 25702;
+    int remotePort = 21702;
+    const char *remoteHost="localhost";
+    const char *message = "Fuck You";
+    cout << "Creating..." << endl;
+    Client obj(portNumber, remoteHost, remotePort);
+    cout << "Receive...A" << endl;
+    obj.receive(buff);
+    cout << buff << endl;
+    cout << "Receive...B" << endl;
+    obj.receive(buff);
+    cout << buff << endl;
+    // cout << "Receive...C" << endl;
+    // obj.receive(buff);
+    // cout << buff << endl;
+    // cout << "Receive...D" << endl;
+    // obj.receive(buff);
+    // cout << buff << endl;
+    // cout << "Send..." << endl;
+    // obj.send(message);
+    cout << "Closing..." << endl;
+	return 0;
+}

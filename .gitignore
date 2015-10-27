@@ -26,3 +26,11 @@
 *.exe
 *.out
 *.app
+
+# Sublime Files
+sftp-config.json
+
+# Custom
+.DS_Store
+server
+client*
