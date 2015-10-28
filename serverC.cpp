@@ -8,14 +8,14 @@ int main()
 {
     char buff[512];
     int array[SIZE][SIZE];
-    int portNumber = 22702;
+    int portNumber = 23702;
     int remotePort = 25702;
     const char *remoteHost="localhost";
     const char *message = "Fuck You";
     cout << "Creating..." << endl;
-    Server obj(portNumber, remoteHost, remotePort, B);
+    Server obj(portNumber, remoteHost, remotePort, C);
 
-    obj.read("serverB.txt");
+    obj.read("serverC.txt");
 
     string serial;
     obj.serialize(&serial);
