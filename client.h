@@ -1,17 +1,9 @@
 #ifndef CLIENT_H 
 #define CLIENT_H
 
-#include <iostream>
-#include <string>
 #include <network_utils.h>
 
 using namespace std;
-
-#define SIZE 4
-enum Name 
-{
-    A = 0, B = 1, C = 2, D = 3
-};
 
 class Client : public NetworkUtils
 {
@@ -24,13 +16,11 @@ class Client : public NetworkUtils
 	public:
 		Client(int, const char *, int[SIZE]);
 		~Client();
-		int send(const char *, Name);
-		int receive(char *);
-		int serialize(string *);
-		int deserialize(string , int [SIZE][SIZE]);
-		int combine(int [SIZE][SIZE]);
+		int send(const Name &);
+		int receive(const Name &, int[SIZE][SIZE]);
+		int combine(int[SIZE][SIZE]);
 		int display();
-		int minKey(int [], bool []);
+		int minKey(int[], bool[]);
 		void computeMST();
 };
 

@@ -1,8 +1,5 @@
-#include <network_utils.h>
 #include <client.h>
 #include <iostream>
-#include <string>
-#include <sstream>
 using namespace std;
 
 Client::Client(int port_number, const char *remote_host, int remote_port[SIZE])
@@ -22,13 +19,13 @@ Client::~Client()
     for (int i = 0; i < SIZE; i++)
         closeSocket(d_udpSocketHandle[i]);
 }
-int Client::send(const char *buff, Name type)
+int Client::send(const Name &server)
 {
-    return udpSend(d_udpSocketHandle[type], d_remoteSocketInfo[type], buff);
+    return udpSend(server, d_udpSocketHandle[server], d_remoteSocketInfo[server], d_adj);
 }
-int Client::receive(char *buff)
+int Client::receive(const Name &server, int adj[SIZE][SIZE])
 {
-    return tcpReceive(d_tcpSocketHandle, buff);
+    return tcpReceive(server, d_tcpSocketHandle, adj);
 }
 int Client::display()
 {
@@ -40,41 +37,6 @@ int Client::display()
         cout << endl;
     }
     cout << endl;
-}
-int Client::serialize(string *serial)
-{
-    *serial = "";
-    std::ostringstream oss;
-    for (int i = 0; i < SIZE; i++)
-    {
-        if (i != 0)
-            *serial += ";";
-        for (int j = 0; j < SIZE; j++)
-        {
-            if (j != 0)
-                *serial += ",";
-            oss << d_adj[i][j];
-            *serial += oss.str();
-            oss.str(string());
-        }
-    }
-    return 0;
-}
-int Client::deserialize(string input, int array[SIZE][SIZE])
-{
-    istringstream ss(input);
-    string token;
-    int i = 0, j = 0, value;
-    while(getline(ss, token, ';')) {
-        istringstream sss(token);
-        string subtoken;
-        j = 0;
-        while(getline(sss, subtoken, ',')) {
-            array[i][j] = atoi(subtoken.c_str());
-            ++j;
-        }
-        ++i;
-    }
     return 0;
 }
 
@@ -149,81 +111,57 @@ void Client::computeMST()
         if (i > 0)
             output[parent[i]][i] = output[i][parent[i]] = d_adj[i][parent[i]];
     }
-
+    int sum = 0;
     for (int i = 0; i < SIZE; i++)
+    {
         for (int j = 0; j < SIZE; j++)
+        {
             d_adj[i][j] = output[i][j];
+            if (j > i && d_adj[i][j] != 0)
+                sum += d_adj[i][j];
+        }
+    }
+    cout << "The Client has calculated a tree. The tree cost is " << sum;
+    cout << "\nEdge\tCost\n";
+    for (int i = 0; i < SIZE; i++)
+    {
+        for (int j = 0; j < SIZE; j++)
+        {
+            if (j > i && d_adj[i][j] != 0)
+                cout << ::type[i] << ::type[j] << "\t" << d_adj[i][j] << endl;
+        }
+    }
 }
 
 int main()
 {
-    char buffA[512], buffB[512], buffC[512], buffD[512];
     int arrayA[SIZE][SIZE], arrayB[SIZE][SIZE], arrayC[SIZE][SIZE], arrayD[SIZE][SIZE];
     int portNumber = 25702;
     int remotePort[] = {21702, 22702, 23702, 24702};
     const char *remoteHost="localhost";
-    string message;
-    cout << "Creating..." << endl;
     Client obj(portNumber, remoteHost, remotePort);
-    
-    cout << "Receive...A" << endl;
-    obj.receive(buffA);
-    cout << buffA << endl;
-
-    cout << "Deserialize...A" << endl;
-    obj.deserialize(buffA, arrayA);
-
-    cout << "Combine...A" << endl;
+    cout << endl;
+    obj.receive(A, arrayA);
     obj.combine(arrayA);
-    
-    cout << "Receive...B" << endl;
-    obj.receive(buffB);
-    cout << buffB << endl;
-
-    cout << "Deserialize...B" << endl;
-    obj.deserialize(buffB, arrayB);
-
-    cout << "Combine...B" << endl;
+    cout << endl;
+    obj.receive(B, arrayB);
     obj.combine(arrayB);
-    
-    cout << "Receive...C" << endl;
-    obj.receive(buffC);
-    cout << buffC << endl;
-
-    cout << "Deserialize...C" << endl;
-    obj.deserialize(buffC, arrayC);
-
-    cout << "Combine...C" << endl;
+    cout << endl;
+    obj.receive(C, arrayC);
     obj.combine(arrayC);
-    
-    cout << "Receive...D" << endl;
-    obj.receive(buffD);
-    cout << buffD << endl;
-
-    cout << "Deserialize...D" << endl;
-    obj.deserialize(buffD, arrayD);
-
-    cout << "Combine...D" << endl;
+    cout << endl;
+    obj.receive(D, arrayD);
     obj.combine(arrayD);
-    
-    obj.display();
-
-    cout << "MST..." << endl;
+    cout << endl;
+    obj.send(A);
+    cout << endl;
+    obj.send(B);
+    cout << endl;
+    obj.send(C);
+    cout << endl;
+    obj.send(D);
+    cout << endl;
     obj.computeMST();
-    obj.display();
 
-    cout << "Serialize..." << endl;
-    obj.serialize(&message);
-
-    cout << "Send...A" << endl;
-    obj.send(message.c_str(), A);
-    cout << "Send...B" << endl;
-    obj.send(message.c_str(), B);
-    cout << "Send...C" << endl;
-    obj.send(message.c_str(), C);
-    cout << "Send...D" << endl;
-    obj.send(message.c_str(), D);
-
-    cout << "Closing..." << endl;
     return 0;
 }
