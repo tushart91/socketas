@@ -1,2 +1,3 @@
 serverB 20
-serverC 10
+serverC 50
+serverD 10
