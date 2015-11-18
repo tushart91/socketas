@@ -59,33 +59,30 @@ int Client::min_key(int key[], bool mstSet[])
  
    return min_index;
 }
-/*
- * This code was reused from 
- * http://www.geeksforgeeks.org/greedy-algorithms-set-5-prims-minimum-spanning-tree-mst-2/
- */
+
 void Client::compute_mst()
 {
 
     int parent[SIZE];
-    int key[SIZE];
-    bool mstSet[SIZE];
+    int node[SIZE];
+    bool mst[SIZE];
 
     for (int i = 0; i < SIZE; i++)
-        key[i] = INT_MAX, mstSet[i] = false;
+        node[i] = INT_MAX, mst[i] = false;
 
-    key[0] = 0;
+    node[0] = 0;
     parent[0] = -1;
 
-    for (int count = 0; count < SIZE-1; count++)
+    for (int num = 0; num < SIZE-1; num++)
     {
-        int u = min_key(key, mstSet);
+        int i = min_key(node, mst);
 
-        mstSet[u] = true;
+        mst[i] = true;
 
-        for (int v = 0; v < SIZE; v++)
+        for (int j = 0; j < SIZE; j++)
 
-            if (d_adj[u][v] && mstSet[v] == false && d_adj[u][v] <  key[v])
-                parent[v]  = u, key[v] = d_adj[u][v];
+            if (d_adj[i][j] && mst[j] == false && d_adj[i][j] <  node[j])
+                parent[j]  = i, node[j] = d_adj[i][j];
         }
 
     int output[SIZE][SIZE];

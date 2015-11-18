@@ -64,7 +64,5 @@ This matrix is then serialized as follows:
 * Also this project assumes all input txt files are available. There is no validation.
 
 ## References
-* For computing the minimum spanning tree from adjacency matrix 
-<http://www.geeksforgeeks.org/greedy-algorithms-set-5-prims-minimum-spanning-tree-mst-2/>
 * Used this as base code for creating TCP sockets but modified over it based on requirements
 <http://www.yolinux.com/TUTORIALS/Sockets.html>
