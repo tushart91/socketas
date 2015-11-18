@@ -138,7 +138,7 @@ int main()
     int arrayA[SIZE][SIZE], arrayB[SIZE][SIZE], arrayC[SIZE][SIZE], arrayD[SIZE][SIZE];
     int portNumber = 25702;
     int remotePort[] = {21702, 22702, 23702, 24702};
-    const char *remoteHost="localhost";
+    const char *remoteHost="127.0.0.1";
     Client obj(portNumber, remoteHost, remotePort);
     cout << endl;
     obj.receive(A, arrayA);

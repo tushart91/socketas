@@ -39,7 +39,7 @@ int NetworkUtils::createStaticTCPSocket(const int &portNumber, int *socketHandle
     }
 
     // Load system information into socket data structures
-    socketInfo.sin_addr.s_addr = htonl(INADDR_ANY); // Use any address available to the system
+    socketInfo.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // Use any address available to the system
     socketInfo.sin_family = AF_INET;
     socketInfo.sin_port = htons(portNumber);      // Set port number
 
@@ -89,7 +89,7 @@ int NetworkUtils::createStaticUDPSocket(const int &portNumber, int *socketHandle
     }
 
     // Load system information into socket data structures
-    socketInfo.sin_addr.s_addr = htonl(INADDR_ANY); // Use any address available to the system
+    socketInfo.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // Use any address available to the system
     socketInfo.sin_family = AF_INET;
     socketInfo.sin_port = htons(portNumber);      // Set port number
 
