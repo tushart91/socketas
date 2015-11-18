@@ -15,6 +15,11 @@ using namespace std;
 
 int NetworkUtils::createStaticTCPSocket(const int &portNumber, int *socketHandle)
 {
+    /*
+     * Most of this code was reused from http://www.yolinux.com/TUTORIALS/Sockets.html
+     * Modifications were made were and when necessary.
+     */
+     
     struct sockaddr_in socketInfo;
     struct hostent *hPtr;
     char sysHost[MAXHOSTNAME+1];  // Hostname of this computer we are running on
@@ -270,6 +275,7 @@ int NetworkUtils::udpSend(const Name &server, const int &socketHandle,
     //Documentation
     struct sockaddr_in sin;
     socklen_t socklen = sizeof(sin);
+    connect(socketHandle, (struct sockaddr *) &pin, peerlen);
     if (getsockname(socketHandle, (struct sockaddr *)&sin, &socklen) == -1)
         cerr << "getsockname error" << endl;
     else

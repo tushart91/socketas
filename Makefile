@@ -35,3 +35,13 @@ network_utils.o: network_utils.cpp network_utils.h
 		$(CC) $(CFLAGS) -c network_utils.cpp
 clean: 
 		rm $(CLIENT) $(SERVER_A) $(SERVER_B) $(SERVER_C) $(SERVER_D) *.o
+runclient:
+		./$(CLIENT)
+runa:
+		./$(SERVER_A)
+runb:
+		./$(SERVER_B)
+runc:
+		./$(SERVER_C)
+rund:
+		./$(SERVER_D)

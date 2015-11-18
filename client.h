@@ -20,8 +20,8 @@ class Client : public NetworkUtils
 		int receive(const Name &, int[SIZE][SIZE]);
 		int combine(int[SIZE][SIZE]);
 		int display();
-		int minKey(int[], bool[]);
-		void computeMST();
+		int min_key(int[], bool[]);
+		void compute_mst();
 };
 
 #endif
