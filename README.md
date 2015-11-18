@@ -61,6 +61,7 @@ This matrix is then serialized as follows:
 ## Idiosyncrasies
 * The project will not play nice if the executables are run out of order. This is because when the server sends messages to the client the client assumes the first message is from server A and second from server B and so on.
 * Also this project assumes there are only 4 servers in the topology.
+* Also this project assumes all input txt files are available. There is no validation.
 
 ## References
 * For computing the minimum spanning tree from adjacency matrix 
