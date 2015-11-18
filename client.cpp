@@ -59,7 +59,10 @@ int Client::min_key(int key[], bool mstSet[])
  
    return min_index;
 }
- 
+/*
+ * This code was reused from 
+ * http://www.geeksforgeeks.org/greedy-algorithms-set-5-prims-minimum-spanning-tree-mst-2/
+ */
 void Client::compute_mst()
 {
 
