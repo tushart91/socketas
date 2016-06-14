@@ -49,13 +49,13 @@ int Client::combine(int array[SIZE][SIZE])
     return 0;
 }
 
-int Client::min_key(int key[], bool mstSet[])
+int Client::min_key(int node[], bool mst[])
 {
    int min = INT_MAX, min_index;
  
-   for (int v = 0; v < SIZE; v++)
-     if (mstSet[v] == false && key[v] < min)
-         min = key[v], min_index = v;
+   for (int i = 0; i < SIZE; i++)
+     if (mst[i] == false && node[i] < min)
+         min = node[i], min_index = i;
  
    return min_index;
 }
